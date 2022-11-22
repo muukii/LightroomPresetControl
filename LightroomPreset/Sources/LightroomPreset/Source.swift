@@ -4,10 +4,14 @@ import GrainDescriptor
 
 ///
 /// https://www.adobe.com/products/xmp.html
+/// https://exiftool.org/TagNames/XMP.html
 public struct Preset: GrainView {
   
   public let uuid: String
+  public let color: Color
   public let effects: Effects
+  public let processVersion: String
+  public let version: String
   
   public init(text: String) throws {
     
@@ -24,6 +28,39 @@ public struct Preset: GrainView {
       clarity: e["crs:Clarity2012"],
       dehaze: e["crs:Dehaze"]
     )
+        
+    self.color = .init(
+      whiteBalance: e["crs:WhiteBalance"],
+      vibrance: e["crs:Vibrance"],
+      saturation: e["crs:Saturation"],
+      grade: .init(
+        blending: e["crs:ColorGradeBlending"],
+        balance: e["crs:SplitToningBalance"],
+        global: .init(
+          hue: e["crs:ColorGradeGlobalHue"],
+          saturation: e["crs:ColorGradeGlobalSat"],
+          luminance: e["crs:ColorGradeGlobalLum"]
+        ),
+        shadow: .init(
+          hue: e["crs:ColorGradeShadowHue"],
+          saturation: e["crs:ColorGradeShadowSat"],
+          luminance: e["crs:ColorGradeShadowLum"]
+        ),
+        midtone: .init(
+          hue: e["crs:ColorGradeMidtoneHue"],
+          saturation: e["crs:ColorGradeMidtoneSat"],
+          luminance: e["crs:ColorGradeMidtoneLum"]
+        ),
+        highlight: .init(
+          hue: e["crs:ColorGradeHighlightHue"],
+          saturation: e["crs:ColorGradeHighlightSat"],
+          luminance: e["crs:ColorGradeHighlightLum"]
+        )
+      )
+    )
+    
+    self.processVersion = e["crs:ProcessVersion"]!
+    self.version = e["crs:Version"]!
 
     let presetType = e["crs:PresetType"]
     let cluster = e["crs:Cluster"]
@@ -38,10 +75,12 @@ public struct Preset: GrainView {
     let supportsOutputReferred = e["crs:SupportsOutputReferred"]
     let requiresRGBTables = e["crs:RequiresRGBTables"]
     let cameraModelRestriction = e["crs:CameraModelRestriction"]
+    
     let copyright = e["crs:Copyright"]
     let contactInfo = e["crs:ContactInfo"]
-    let version = e["crs:Version"]
+    
     let processVersion = e["crs:ProcessVersion"]
+    
     let contrast2012 = e["crs:Contrast2012"]
     let highlights2012 = e["crs:Highlights2012"]
     let shadows2012 = e["crs:Shadows2012"]
@@ -90,20 +129,12 @@ public struct Preset: GrainView {
     let luminanceAdjustmentBlue = e["crs:LuminanceAdjustmentBlue"]
     let luminanceAdjustmentPurple = e["crs:LuminanceAdjustmentPurple"]
     let luminanceAdjustmentMagenta = e["crs:LuminanceAdjustmentMagenta"]
-    let splitToningShadowHue = e["crs:SplitToningShadowHue"]
-    let splitToningShadowSaturation = e["crs:SplitToningShadowSaturation"]
-    let splitToningHighlightHue = e["crs:SplitToningHighlightHue"]
-    let splitToningHighlightSaturation = e["crs:SplitToningHighlightSaturation"]
-    let splitToningBalance = e["crs:SplitToningBalance"]
-    let colorGradeMidtoneHue = e["crs:ColorGradeMidtoneHue"]
-    let colorGradeMidtoneSat = e["crs:ColorGradeMidtoneSat"]
-    let colorGradeShadowLum = e["crs:ColorGradeShadowLum"]
-    let colorGradeMidtoneLum = e["crs:ColorGradeMidtoneLum"]
-    let colorGradeHighlightLum = e["crs:ColorGradeHighlightLum"]
-    let colorGradeBlending = e["crs:ColorGradeBlending"]
-    let colorGradeGlobalHue = e["crs:ColorGradeGlobalHue"]
-    let colorGradeGlobalSat = e["crs:ColorGradeGlobalSat"]
-    let colorGradeGlobalLum = e["crs:ColorGradeGlobalLum"]
+//    let splitToningShadowHue = e["crs:SplitToningShadowHue"]
+//    let splitToningShadowSaturation = e["crs:SplitToningShadowSaturation"]
+//    let splitToningHighlightHue = e["crs:SplitToningHighlightHue"]
+//    let splitToningHighlightSaturation = e["crs:SplitToningHighlightSaturation"]
+//    let splitToningBalance = e["crs:SplitToningBalance"]
+//    let colorGradeBlending = e["crs:ColorGradeBlending"]
     let autoLateralCA = e["crs:AutoLateralCA"]
     let lensProfileEnable = e["crs:LensProfileEnable"]
     let defringePurpleAmount = e["crs:DefringePurpleAmount"]
@@ -122,6 +153,7 @@ public struct Preset: GrainView {
     let postCropVignetteStyle = e["crs:PostCropVignetteStyle"]
     let postCropVignetteHighlightContrast = e["crs:PostCropVignetteHighlightContrast"]
     let shadowTint = e["crs:ShadowTint"]
+    
     let redHue = e["crs:RedHue"]
     let redSaturation = e["crs:RedSaturation"]
     let greenHue = e["crs:GreenHue"]
@@ -133,6 +165,7 @@ public struct Preset: GrainView {
     let lensProfileSetup = e["crs:LensProfileSetup"]
     let hasSettings = e["crs:HasSettings"]
     
+    print(self)
   }
   
   public var body: some GrainView {
@@ -269,6 +302,29 @@ extension Preset {
   
   public struct Color {
     
+    public struct Grade {
+      
+      public struct Part {
+        public let hue: String?
+        public let saturation: String?
+        public let luminance: String?
+      }
+      
+      public let blending: String?
+      public let balance: String?
+
+      public let global: Part
+      public let shadow: Part
+      public let midtone: Part
+      public let highlight: Part
+      
+    }
+    
+    public let whiteBalance: String?
+    public let vibrance: String?
+    public let saturation: String?
+    public let grade: Grade?
+        
   }
   
   public struct Effects: GrainView {
